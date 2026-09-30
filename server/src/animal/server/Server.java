@@ -4,31 +4,24 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 import animal.common.Animal;
-
-/**
- * Le LANCEUR du serveur : il cree le servant et le publie.
- *
- * Deux modes, comme en TD 1 :
- *   java animal.server.Server             -> registre externe (rmiregistry)
- *   java animal.server.Server --embedded  -> registre cree dans cette JVM
- */
+import animal.common.Espece;
 
 public class Server {
-
-    public static final int PORT = 1099;
-
     public static void main(String[] args) {
-        boolean embedded = args.length > 0 && "--embedded".equals(args[0]);
         try {
-            Animal obj = new AnimalImpl("Goldy", "Heythem", "Golden Retreiver", "Dog");
-            Registry registry = embedded
-                    ? LocateRegistry.createRegistry(PORT)
-                    : LocateRegistry.getRegistry(PORT);
-            registry.rebind("Animal", obj);
-            System.out.println("Server ready(registre "
-                        + (embedded ? "interne" : "externe") + ", port " + PORT + ")");
+            System.setProperty("java.rmi.server.hostname", "127.0.0.1");
+
+            Registry registry = LocateRegistry.createRegistry(1099);
+            System.out.println("RMI Registry started on port 1099.");
+
+            Espece espece = new Espece("Dog", 13);
+            AnimalImpl animal = new AnimalImpl("Goldy", "Alice", "Retriever", espece, "Vaccins a jour.");
+
+            registry.rebind("Animal", animal);
+            System.out.println("Server is ready and 'Animal' is published.");
+
         } catch (Exception e) {
-            System.err.println("Server exception: " + e);
+            System.err.println("Server exception: " + e.toString());
             e.printStackTrace();
         }
     }

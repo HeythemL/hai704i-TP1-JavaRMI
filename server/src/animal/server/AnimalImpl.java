@@ -4,20 +4,23 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 import animal.common.Animal;
+import animal.common.Dossier;
+import animal.common.Espece;
 
 public class AnimalImpl extends UnicastRemoteObject implements Animal {
     private final String nom;
     private final String maitre;
     private final String race;
-    private final String espece;
+    private final Espece espece;
+    private final Dossier dossier;
     
-    public AnimalImpl(String nom, String maitre, String race, String espece) throws RemoteException {
+    public AnimalImpl(String nom, String maitre, String race, Espece espece, String texteDossier) throws RemoteException {
         super();
         this.nom = nom;
         this.maitre = maitre;
         this.race = race;
         this.espece = espece;
-
+        this.dossier = new DossierImpl(texteDossier);
     }
 
     @Override
@@ -33,8 +36,12 @@ public class AnimalImpl extends UnicastRemoteObject implements Animal {
         return race;
     }
     @Override
-    public String getEspece() throws RemoteException {
+    public Espece getEspece() throws RemoteException {
         return espece;
+    }
+    @Override
+    public Dossier getDossier() throws RemoteException {
+        return dossier;
     }
     
 }
