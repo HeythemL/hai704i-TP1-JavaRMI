@@ -3,10 +3,14 @@ package animal.client;
 import java.lang.reflect.Proxy;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Arrays;
+import java.util.List;
 
 import animal.common.Animal;
+import animal.common.Cabinet;
 import animal.common.Dossier;
 import animal.common.Espece;
+import animal.common.PatientIntrouvableException;
 
 /**
  * Le CLIENT. Il ne connait que l'interface Animal et la classe Espece, jamais AnimalImpl.
@@ -22,8 +26,22 @@ public class Client {
         try {
             Registry registry = LocateRegistry.getRegistry(host, 1099);
             // Animal stub
-            Animal stub = (Animal) registry.lookup("Animal");
-            System.out.println("classe du stub : " + stub.getClass().getName());
+
+            System.out.println(Arrays.toString(registry.list()));
+            Cabinet cabinet = (Cabinet) registry.lookup("Cabinet");
+            List<Animal> patients = cabinet.getPatients();
+            System.out.println("Nombre de patients : " + patients.size());
+            for (Animal a : patients) {
+                System.out.println(" - " + a.getNom() + " | " + a.getClass().getName()
+                        + " | proxy ? " + Proxy.isProxyClass(a.getClass()));
+            }
+            Animal stub = cabinet.rechercherParNom("Goldy");
+            System.out.println("Trouve : " + stub.getNom() + ", maitre " + stub.getMaitre());
+            try {
+                cabinet.rechercherParNom("Felix");
+            } catch (PatientIntrouvableException ex) {
+                System.out.println("Recherche infructueuse : " + ex.getMessage());
+            }            System.out.println("classe du stub : " + stub.getClass().getName());
             System.out.println("proxy dynamique ? " + Proxy.isProxyClass(stub.getClass()));
             System.out.println("response: " + stub.getNom() + " " + stub.getMaitre());
             // Espece
