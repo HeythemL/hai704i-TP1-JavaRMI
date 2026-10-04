@@ -6,11 +6,7 @@ import java.rmi.registry.Registry;
 import java.util.Arrays;
 import java.util.List;
 
-import animal.common.Animal;
-import animal.common.Cabinet;
-import animal.common.Dossier;
-import animal.common.Espece;
-import animal.common.PatientIntrouvableException;
+import animal.common.*;
 
 /**
  * Le CLIENT. Il ne connait que l'interface Animal et la classe Espece, jamais AnimalImpl.
@@ -66,7 +62,27 @@ public class Client {
             //relecture pour verifier si la modification a ete effectee
             Dossier d2 = stub.getDossier();
             System.out.println("Dossier initial : " + d2.getTexte());
-
+            // A5 TEST
+            //
+            //
+            System.out.println("Patients avant : " + cabinet.getNombrePatients());
+            Animal rex = cabinet.ajouterPatient("Rex", "Dina", "Berger", new Espece("Chien", 12), "");
+            System.out.println("Cree : " + rex.getNom()
+                    + " | proxy ? " + Proxy.isProxyClass(rex.getClass()));
+            System.out.println("Patients apres : " + cabinet.getNombrePatients());
+            System.out.println("Retrouve : " + cabinet.rechercherParNom("Rex").getMaitre());
+            //
+            // A7 TEST
+            //
+            Cabinet cab = (Cabinet) LocateRegistry.getRegistry(null, 1099).lookup("Cabinet");
+            try {
+                cab.ajouterPatient("Medor", "Paul", "Berger", new Chien(), "");
+            } catch (Exception e) {
+                System.out.println("Exception : " + e.getClass().getName());
+                for (Throwable t = e.getCause(); t != null; t = t.getCause())
+                    System.out.println("  cause : " + t.getClass().getName() + " -> " + t.getMessage());
+            }
+            //
         } catch (Exception e) {
             System.err.println("Client exception: " + e);
             e.printStackTrace();
